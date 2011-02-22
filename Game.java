@@ -1,11 +1,13 @@
 import java.awt.Point;
 import java.awt.Dimension;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 class Game{
 	private Dimension gridDims;
 	private short[][] grid;
 	private boolean[][] explored;
+	Scanner input = new Scanner(System.in);
 
 	public Game(int width, int height, Point... mines){
 		gridDims = new Dimension(width, height);
@@ -19,7 +21,7 @@ class Game{
 				grid[i][j] = countAdjacentMines(i,j);
 			}
 		}
-		//select(0,0);
+		select(0,4);
 	}
 
 	public Game(){
@@ -40,10 +42,10 @@ class Game{
 		}
 		else if (grid[x][y] == 0){
 			for (Point p : getAdjacentMines(x,y)){
-			if(grid[p.x][p.y] == 0){
-				select(p.x,p.y);
-			}	
-		}
+				if(!explored[p.x][p.y] && grid[p.x][p.y] == 0){
+					select(p.x,p.y);
+				}	
+			}
 		}
 		return true;
 	}
@@ -68,9 +70,9 @@ class Game{
 			for(int j = -1; j <= 1; j++){
 				cx = x + i;
 				cy = y + j;
-				if(cx > 0 && cx < gridDims.width && 
-						cy > 0 && cy < gridDims.height &&
-						x != 0 && y != 0){
+				if(cx >= 0 && cx < gridDims.width && 
+						cy >= 0 && cy < gridDims.height &&
+						!(i == 0 && j == 0)){
 					adjacents.add(new Point(cx, cy));
 						}	
 
@@ -123,7 +125,7 @@ class Game{
 						System.out.print("◻ ");
 					}
 					else{
-						System.out.print(grid[i][j] + " ");
+						System.out.print(grid[j][i] + " ");
 					}
 				}
 				else{
