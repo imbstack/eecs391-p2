@@ -3,6 +3,6 @@ class Minesweeper{
 		Game play = new Game();
 		//play.printFullGrid();
 		//play.showMines();
-		play.printState();
+		//play.printState();
 	}
 }

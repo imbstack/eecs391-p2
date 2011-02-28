@@ -21,8 +21,10 @@ class Game{
 				grid[i][j] = countAdjacentMines(i,j);
 			}
 		}
-		select(0,4);
+		select(0,0);
+		playGameVsHuman();
 	}
+
 
 	public Game(){
 		this(5,5,new Point(2,1), new Point(1,3), new Point(3,3));
@@ -33,6 +35,34 @@ class Game{
 	 * of mines, and settable grid size, just like the real game.
 	 */
 
+	private void playGameVsHuman(){
+		boolean t;
+		while( !hasWon() ){
+			printState();
+			do{
+			t = humanPlay();
+			}while(!t);
+		}	
+	}
+
+	private boolean humanPlay(){
+		System.out.println("Select next spot:");
+		String in = input.nextLine();
+		//TODO: implement flagging
+		String[] selection = in.split(" ");
+		try
+		{
+			int y = Integer.parseInt(selection[0]) - 1;
+			int x = Integer.parseInt(selection[1]) - 1;
+			select(x, y);
+			return true;
+		}
+		catch (NumberFormatException nfe)
+		{
+			System.out.println("NumberFormatException: " + nfe.getMessage());
+			return false;
+		}
+	}
 
 	public boolean select(int x, int y){
 		explored[x][y] = true;
@@ -79,6 +109,17 @@ class Game{
 			}	
 		}
 		return adjacents;
+	}
+
+	private boolean hasWon(){
+		for(int i = 0; i < gridDims.width; i++){
+			for(int j = 0; j < gridDims.height; j++){
+				if(!explored[i][j] && grid[i][j] != 9){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	//Printing methods --------------//
