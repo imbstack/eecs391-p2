@@ -2,14 +2,16 @@ import java.awt.Point;
 import java.awt.Dimension;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Random;
 
 class Game{
 	private Dimension gridDims;
 	private short[][] grid;
 	private boolean[][] explored;
-	Scanner input = new Scanner(System.in);
+	private Scanner input = new Scanner(System.in);
+	private static Point[] dboard = {new Point(2,1), new Point(1,3), new Point(3,3)};
 
-	public Game(int width, int height, Point... mines){
+	public Game(int width, int height, Point[] mines){
 		gridDims = new Dimension(width, height);
 		grid = new short[gridDims.width][gridDims.height];
 		explored = new boolean[gridDims.width][gridDims.height];
@@ -27,13 +29,30 @@ class Game{
 
 
 	public Game(){
-		this(5,5,new Point(2,1), new Point(1,3), new Point(3,3));
+		this(5,5, dboard);
 	}
 
-	/*
-	 * Eventually implement Game constructor with random placement 
-	 * of mines, and settable grid size, just like the real game.
-	 */
+
+	public Game(int width, int height, int difficulty){
+		this(width, height, genRandPoints(width, height, difficulty));
+	}
+
+	private static Point[] genRandPoints(int width, int height, int difficulty){
+		float frac = 0.0f;//Fraction of squares that will be mines
+		switch(difficulty){
+			case 1: frac = 0.10f;break;
+			case 2: frac = 0.15f;break;
+			case 3: frac = 0.20f;break;
+			default:frac = 0.12f;break;
+		}
+		Point[] ret = new Point[(int)(width * height * frac)];
+		Random generator = new Random();
+		for (int i = 0; i < ret.length; i++){
+			ret[i] = new Point(generator.nextInt(height), generator.nextInt(width));
+		}
+		return ret;
+
+	}
 
 	private void playGameVsHuman(){
 		boolean t;
@@ -52,14 +71,18 @@ class Game{
 		String[] selection = in.split(" ");
 		try
 		{
-			int y = Integer.parseInt(selection[0]) - 1;
-			int x = Integer.parseInt(selection[1]) - 1;
+			int x = Integer.parseInt(selection[0]) - 1;
+			int y = Integer.parseInt(selection[1]) - 1;
+			if (x > gridDims.width || y > gridDims.height || x < 0 || y < 0){
+				System.err.println("Invalid coordinates, try again!");
+				return false;
+			}
 			select(x, y);
 			return true;
 		}
 		catch (NumberFormatException nfe)
 		{
-			System.out.println("NumberFormatException: " + nfe.getMessage());
+			System.err.println("NumberFormatException: " + nfe.getMessage());
 			return false;
 		}
 	}
