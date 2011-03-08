@@ -1,3 +1,6 @@
+// TODO: DO NOT LET PLAYER USE MORE FLAGS THAN THERE ARE MINES
+
+
 import java.awt.Point;
 import java.awt.Dimension;
 import java.util.LinkedList;
@@ -8,6 +11,7 @@ class Game{
 	private Dimension gridDims;
 	private short[][] grid;
 	private boolean[][] explored;
+	private boolean[][] flagged;
 	private Scanner input = new Scanner(System.in);
 	private static Point[] dboard = {new Point(2,1), new Point(1,3), new Point(3,3)};
 	private static boolean hasWon = true;
@@ -16,6 +20,7 @@ class Game{
 		gridDims = new Dimension(width, height);
 		grid = new short[gridDims.width][gridDims.height];
 		explored = new boolean[gridDims.width][gridDims.height];
+		flagged = new boolean[gridDims.width][gridDims.height];
 		for(Point mine : mines){
 			grid[mine.x][mine.y] = 9;
 		}
@@ -24,7 +29,7 @@ class Game{
 				grid[i][j] = countAdjacentMines(i,j);
 			}
 		}
-		select(0,0);
+		select(0,0, false);
 		playGameVsHuman();
 	}
 
@@ -56,11 +61,15 @@ class Game{
 	}
 
 	private void playGameVsHuman(){
+		String welcome = "Ready to play?\nEach selection is made with a triple\nof the form x y [flag], where "+
+		       		 "each of\nthe coordinates is indexed from 1 and the\nflag is represented by an optional f\n"+
+				 "To quit early, pass in the string \"quit\"\nwithout the quotes.\n";
+		System.out.println(welcome);	
 		boolean t;
 		while( !gameOver() ){
 			printState();
 			do{
-			t = humanPlay();
+				t = humanPlay();
 			}while(!t);
 		}	
 		if (hasWon){
@@ -71,24 +80,26 @@ class Game{
 		}
 		this.showMines();
 		System.exit(0);
-		
+
 	}
 
 	private boolean humanPlay(){
 		System.out.println("Select next spot:");
 		String in = input.nextLine();
+		if (in.toUpperCase().matches("QUIT"))System.exit(0);
 		in = in.trim();
-		//TODO: implement flagging
 		String[] selection = in.split("([.,!?:;'\"-]|\\s)+");//split on commas and whitespace
+		boolean flagging = false;
 		try
 		{
 			int x = Integer.parseInt(selection[0]) - 1;
 			int y = Integer.parseInt(selection[1]) - 1;
+			if (selection.length == 3 && selection[2].charAt(0) == 'f') flagging = true;
 			if (x > gridDims.width || y > gridDims.height || x < 0 || y < 0){
 				System.err.println("Invalid coordinates, try again!");
 				return false;
 			}
-			return select(x, y);
+			return select(x, y, flagging);
 		}
 		catch (NumberFormatException nfe)
 		{
@@ -101,16 +112,22 @@ class Game{
 		}
 	}
 
-	public boolean select(int x, int y){
-		explored[x][y] = true;
-		if (grid[x][y] == 0){
-			for (Point p : getAdjacentMines(x,y)){
-				if(!explored[p.x][p.y] && grid[p.x][p.y] == 0){
-					select(p.x,p.y);
-				}	
-			}
+	public boolean select(int x, int y, boolean flag){
+		if (flag){
+			flagged[x][y] = true;
+			return true;
 		}
-		return true;
+		else{
+			explored[x][y] = true;
+			if (grid[x][y] == 0){
+				for (Point p : getAdjacentMines(x,y)){
+					if(!explored[p.x][p.y] && grid[p.x][p.y] == 0){
+						select(p.x,p.y, false);
+					}	
+				}
+			}
+			return true;
+		}
 	}
 
 	private short countAdjacentMines(int x, int y){
@@ -208,6 +225,9 @@ class Game{
 					else{
 						System.out.print(grid[j][i] + " ");
 					}
+				}
+				else if(flagged[j][i]){
+					System.out.print("F ");
 				}
 				else{
 					System.out.print("◼ ");
