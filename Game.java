@@ -61,7 +61,7 @@ class Game{
 	}
 
 	private void playGameVsHuman(){
-		String welcome = "Ready to play?\nEach selection is made with a triple\nof the form x y [flag], where "+
+		String welcome = "Ready to play?\nEach selection is made with a triple\nof the form y x [flag], where "+
 		       		 "each of\nthe coordinates is indexed from 1 and the\nflag is represented by an optional f\n"+
 				 "To quit early, pass in the string \"quit\"\nwithout the quotes.\n";
 		System.out.println(welcome);	
@@ -92,8 +92,8 @@ class Game{
 		boolean flagging = false;
 		try
 		{
-			int x = Integer.parseInt(selection[0]) - 1;
-			int y = Integer.parseInt(selection[1]) - 1;
+			int x = Integer.parseInt(selection[1]) - 1;
+			int y = Integer.parseInt(selection[0]) - 1;
 			if (selection.length == 3 && selection[2].charAt(0) == 'f') flagging = true;
 			if (x > gridDims.width || y > gridDims.height || x < 0 || y < 0){
 				System.err.println("Invalid coordinates, try again!");
