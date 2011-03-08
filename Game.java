@@ -10,6 +10,7 @@ class Game{
 	private boolean[][] explored;
 	private Scanner input = new Scanner(System.in);
 	private static Point[] dboard = {new Point(2,1), new Point(1,3), new Point(3,3)};
+	private static boolean hasWon = true;
 
 	public Game(int width, int height, Point[] mines){
 		gridDims = new Dimension(width, height);
@@ -56,19 +57,29 @@ class Game{
 
 	private void playGameVsHuman(){
 		boolean t;
-		while( !hasWon() ){
+		while( !gameOver() ){
 			printState();
 			do{
 			t = humanPlay();
 			}while(!t);
 		}	
+		if (hasWon){
+			System.out.println("You Won!");
+		}
+		else{
+			System.out.println("You have lost...");
+		}
+		this.showMines();
+		System.exit(0);
+		
 	}
 
 	private boolean humanPlay(){
 		System.out.println("Select next spot:");
 		String in = input.nextLine();
+		in = in.trim();
 		//TODO: implement flagging
-		String[] selection = in.split(" ");
+		String[] selection = in.split("([.,!?:;'\"-]|\\s)+");//split on commas and whitespace
 		try
 		{
 			int x = Integer.parseInt(selection[0]) - 1;
@@ -77,23 +88,22 @@ class Game{
 				System.err.println("Invalid coordinates, try again!");
 				return false;
 			}
-			select(x, y);
-			return true;
+			return select(x, y);
 		}
 		catch (NumberFormatException nfe)
 		{
 			System.err.println("NumberFormatException: " + nfe.getMessage());
 			return false;
 		}
+		catch (Exception e){
+			System.err.println("Improper input: " + e.getMessage());
+			return false;
+		}
 	}
 
 	public boolean select(int x, int y){
 		explored[x][y] = true;
-		if(grid[x][y] == 9){
-			System.out.println("-----Game Over-----");
-			return false;
-		}
-		else if (grid[x][y] == 0){
+		if (grid[x][y] == 0){
 			for (Point p : getAdjacentMines(x,y)){
 				if(!explored[p.x][p.y] && grid[p.x][p.y] == 0){
 					select(p.x,p.y);
@@ -134,15 +144,22 @@ class Game{
 		return adjacents;
 	}
 
-	private boolean hasWon(){
+	private boolean gameOver(){
+		boolean moreLeft = false;//Are there more tiles to be explored?
 		for(int i = 0; i < gridDims.width; i++){
 			for(int j = 0; j < gridDims.height; j++){
-				if(!explored[i][j] && grid[i][j] != 9){
-					return false;
+				if(explored[i][j] && grid[i][j] == 9){
+					//Set the flag that the player lost, and return
+					//true that the game has ended
+					hasWon = false;
+					return true;
+				}
+				else if(!explored[i][j] && grid[i][j] != 9){
+					moreLeft = true;
 				}
 			}
 		}
-		return true;
+		return !moreLeft;
 	}
 
 	//Printing methods --------------//
