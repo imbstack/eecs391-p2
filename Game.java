@@ -16,7 +16,52 @@ class Game{
 	private static Point[] dboard = {new Point(2,1), new Point(1,3), new Point(3,3)};
 	private static boolean hasWon = true;
 
-	public Game(int width, int height, Point[] mines){
+
+	//getters and setters
+	
+	public int width(){
+		return this.gridDims.width;
+	}
+	public int height(){
+		return this.gridDims.height;
+	}
+	public int valOf(int x, int y){
+		if (explored[x][y]){
+			return grid[x][y];
+		}
+		else{
+			return 10;
+		}
+	}
+	public boolean isFlagged(int x, int y){
+		return flagged[x][y];
+	}
+	public boolean isExplored(int x, int y){
+		return explored[x][y];
+	}
+	public boolean select(int x, int y, boolean flag){
+		if (flag){
+			flagged[x][y] = true;
+			return true;
+		}
+		else{
+			explored[x][y] = true;
+			if (grid[x][y] == 0){
+				for (Point p : getAdjacentMines(x,y)){
+					if(!explored[p.x][p.y] && grid[p.x][p.y] == 0){
+						select(p.x,p.y, false);
+					}	
+				}
+			}
+			return true;
+		}
+	}
+
+
+
+	//constructors
+
+	private Game(int width, int height, Point[] mines, boolean human){
 		gridDims = new Dimension(width, height);
 		grid = new short[gridDims.width][gridDims.height];
 		explored = new boolean[gridDims.width][gridDims.height];
@@ -30,18 +75,25 @@ class Game{
 			}
 		}
 		select(0,0, false);
-		playGameVsHuman();
+		if(human){
+			playGameVsHuman();
+		}
+		else{
+			playGame();
+		}
 	}
 
 
 	public Game(){
-		this(5,5, dboard);
+		this(5,5, dboard, false);
 	}
 
 
 	public Game(int width, int height, int difficulty){
-		this(width, height, genRandPoints(width, height, difficulty));
+		this(width, height, genRandPoints(width, height, difficulty),true);
 	}
+
+	//other functions
 
 	private static Point[] genRandPoints(int width, int height, int difficulty){
 		float frac = 0.0f;//Fraction of squares that will be mines
@@ -83,6 +135,10 @@ class Game{
 
 	}
 
+	private void playGame(){
+		return;
+	}
+
 	private boolean humanPlay(){
 		System.out.println("Select next spot:");
 		String in = input.nextLine();
@@ -109,24 +165,6 @@ class Game{
 		catch (Exception e){
 			System.err.println("Improper input: " + e.getMessage());
 			return false;
-		}
-	}
-
-	public boolean select(int x, int y, boolean flag){
-		if (flag){
-			flagged[x][y] = true;
-			return true;
-		}
-		else{
-			explored[x][y] = true;
-			if (grid[x][y] == 0){
-				for (Point p : getAdjacentMines(x,y)){
-					if(!explored[p.x][p.y] && grid[p.x][p.y] == 0){
-						select(p.x,p.y, false);
-					}	
-				}
-			}
-			return true;
 		}
 	}
 
