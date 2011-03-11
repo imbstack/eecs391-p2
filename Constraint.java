@@ -15,8 +15,11 @@ class Constraint{
 	public boolean satisfied(){
 		int sum = 0;
 		for (Variable v : vars){
-			sum += v.value;
+			if (v.value > -1){
+				sum += v.value;
+			}
 		}
-		return sum <= val;
+		System.out.println(sum + ", " + val);
+		return sum == val;
 	}
 }

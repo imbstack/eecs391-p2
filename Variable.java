@@ -1,4 +1,4 @@
-class Variable{
+class Variable implements Comparable{
 	public int x, y, value;
 	public Domain domain;
 
@@ -16,6 +16,15 @@ class Variable{
 		}
 	}
 
+	public void set(int val){
+		this.value = val;
+	}
+
+	public void unset(){
+		this.value = -1;
+	}
+
+	//OLD STUFF BELOW HERE----- REMOVE DOMAIN EVENTUALLY
 	public void remove(int value){
   		this.value = domain.remove(value);
 	}	
@@ -23,5 +32,10 @@ class Variable{
 	public void add(int value){
 		this.value = -1;
 		this.domain.add(value);
+	}
+
+	public int compareTo(Object o){
+		//default to all equal for now
+		return 0;
 	}
 }
