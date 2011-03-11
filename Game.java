@@ -47,14 +47,26 @@ class Game{
 		else{
 			explored[x][y] = true;
 			if (grid[x][y] == 0){
-				for (Point p : getAdjacentMines(x,y)){
-					if(!explored[p.x][p.y] && grid[p.x][p.y] == 0){
+				for (Point p : getAdjacentPoints(x,y)){
+					if(!explored[p.x][p.y]){
 						select(p.x,p.y, false);
 					}	
 				}
 			}
 			return true;
 		}
+	}
+	public LinkedList<Variable> getAdjacentVars(int x, int y){
+		LinkedList<Variable> vars = new LinkedList<Variable>();
+		for (Point p : getAdjacentPoints(x,y)){
+			if (isExplored(p.x,p.y)){
+				vars.add(new Variable(p.x,p.y, true));
+			}
+			else{
+				vars.add(new Variable(p.x,p.y,false));
+			}
+		}
+		return vars;
 	}
 
 
@@ -136,8 +148,10 @@ class Game{
 	}
 
 	private void playGame(){
-		return;
+		Backtracking back = new Backtracking(this);
+		back.search();
 	}
+
 
 	private boolean humanPlay(){
 		System.out.println("Select next spot:");
@@ -173,7 +187,7 @@ class Game{
 			return 9;
 		}
 		short mineCount = 0;
-		for (Point p : getAdjacentMines(x,y)){
+		for (Point p : getAdjacentPoints(x,y)){
 			if(grid[p.x][p.y] == 9){
 				mineCount++;
 			}	
@@ -181,7 +195,7 @@ class Game{
 		return mineCount;
 	}
 
-	private LinkedList<Point> getAdjacentMines(int x, int y){
+	private LinkedList<Point> getAdjacentPoints(int x, int y){
 		LinkedList<Point> adjacents = new LinkedList<Point>();
 		int cx,cy;
 		for(int i = -1; i <= 1; i++){
@@ -198,6 +212,7 @@ class Game{
 		}
 		return adjacents;
 	}
+
 
 	private boolean gameOver(){
 		boolean moreLeft = false;//Are there more tiles to be explored?
