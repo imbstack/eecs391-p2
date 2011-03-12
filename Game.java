@@ -56,14 +56,31 @@ class Game{
 			return true;
 		}
 	}
-	public LinkedList<Variable> getAdjacentVars(int x, int y){
+	public LinkedList<Point> getAdjacentPoints(int x, int y){
+		LinkedList<Point> adjacents = new LinkedList<Point>();
+		int cx,cy;
+		for(int i = -1; i <= 1; i++){
+			for(int j = -1; j <= 1; j++){
+				cx = x + i;
+				cy = y + j;
+				if(cx >= 0 && cx < gridDims.width && 
+						cy >= 0 && cy < gridDims.height &&
+						!(i == 0 && j == 0)){
+					adjacents.add(new Point(cx, cy));
+						}	
+
+			}	
+		}
+		return adjacents;
+	}
+
+	public LinkedList<Variable> getUnexploredVars(){
 		LinkedList<Variable> vars = new LinkedList<Variable>();
-		for (Point p : getAdjacentPoints(x,y)){
-			if (isExplored(p.x,p.y)){
-				vars.add(new Variable(p.x,p.y, true));
-			}
-			else{
-				vars.add(new Variable(p.x,p.y,false));
+		for (int i = 0; i < width(); i++){
+			for (int j = 0; j < height(); j++){
+				if (!explored[i][j]){
+					vars.add(new Variable(i,j, false));
+				}
 			}
 		}
 		return vars;
@@ -149,7 +166,20 @@ class Game{
 
 	private void playGame(){
 		Backtracking back = new Backtracking(this);
-		back.search();
+		int play = 1;
+		while( !gameOver() ) {
+			System.out.println("MOVE: " + play++);
+			back.search();
+			printState();
+		}
+		if (hasWon){
+			System.out.println("You Won!");
+		}
+		else{
+			System.out.println("You have lost...");
+		}
+		this.showMines();
+		System.exit(0);
 	}
 
 
@@ -195,23 +225,6 @@ class Game{
 		return mineCount;
 	}
 
-	private LinkedList<Point> getAdjacentPoints(int x, int y){
-		LinkedList<Point> adjacents = new LinkedList<Point>();
-		int cx,cy;
-		for(int i = -1; i <= 1; i++){
-			for(int j = -1; j <= 1; j++){
-				cx = x + i;
-				cy = y + j;
-				if(cx >= 0 && cx < gridDims.width && 
-						cy >= 0 && cy < gridDims.height &&
-						!(i == 0 && j == 0)){
-					adjacents.add(new Point(cx, cy));
-						}	
-
-			}	
-		}
-		return adjacents;
-	}
 
 
 	private boolean gameOver(){

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.awt.Point;
 import java.util.PriorityQueue;
 import java.util.Stack;
+import java.util.Random;
 
 class Backtracking{
 
@@ -10,109 +11,110 @@ class Backtracking{
 	public LinkedList<Constraint> constraints;
 	private PriorityQueue<Variable> unassigned;
 	private Stack<Variable> assigned;
+	private static int[] domain = {1,0};
+	private Random generator;
 
 	public Backtracking(Game game){
 		this.game = game;
 		constraints = new LinkedList<Constraint>();
 		unassigned = new PriorityQueue<Variable>();
 		assigned = new Stack<Variable>();
+		generator = new Random();
 	}
 
 	public void search(){
 		//interact with world in this one
 		updateState();
-		step();
-		printVarVals();
+		if (step(1)){
+			for ( Variable v : assigned ){
+				if ( v.value == 0){
+					System.out.println("Selection: "+ (v.x + 1) + ", " + (v.y + 1));
+					game.select(v.x,v.y,false);
+					break;
+				}
+			}
+		}
+		else{
+			System.out.println("RANDOM SELECTION!!!");
+			int next = generator.nextInt(unassigned.size());
+			Variable v = game.getUnexploredVars().get(next);
+			game.select(v.x, v.y, false);
+		}
+		printVarVals(true);
 	}
 
 
-	private boolean step(){
+	private boolean step(int level){
+		//System.out.println("----------------------------------" + level);
 		if (unassigned.isEmpty())return true;
 		Variable cvar = unassigned.poll();
-		for (int i = 0; i <= 1; i++){
-			cvar.set(i);
-			if (isConsistent()){
-				assigned.add(cvar);	
-				boolean result = step();
+		//System.out.println(cvar.x + " " + cvar.y);
+		for (int i : domain){
+			if (isConsistent(cvar, i)){
+				cvar.set(i);
+				assigned.add(cvar);
+				boolean result = step(level + 1);
 				if (result){
 					return result;
 				}
+				else{
+					Variable v = assigned.pop();
+					v.unset();
+					unassigned.add(v);
+				}
 			}
-			Variable v = assigned.pop();
-			v.unset();
-			unassigned.add(v);
 		}
 		return false;
 	}
 
-	private boolean isConsistent(){
+	private boolean isConsistent(Variable var, int value){
 		for (Constraint c : constraints){
-			if (!c.satisfied()){
+			if (!c.satisfied(var, value)){
 				return  false;
 			}
 		}
 		return true;
 	}
 
-/*
-	public boolean step(int toBeAssigned){
-		if(toBeAssigned == 0){
-			return true;
-		}
-		for (Variable var : variables){
-			//make this ordered eventually
-			//also have better way than just iterating through, maybe...
-			if (var.value < 0){
-				for (int i = 0; i < var.domain.values.size(); i++){
-					int value = var.domain.values.get(i);
-					var.remove(value);
-					boolean consistent = true;
-					for (Constraint c : constraints){
-						if (!c.satisfied()){
-							consistent = false;
-						}	
-					}
-					if (consistent){
-						//make inferences
-						boolean result = step(toBeAssigned-1);
-						if (result)return result;
-					}
-					else{
-						var.add(value);
-					}
-				}
-			}
-		}	
-		return false;
-	}
-*/
 	private void updateState(){
 		unassigned.clear();
 		constraints.clear();
+		assigned.clear();
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
-				int temp = game.valOf(i,j);
-				if (temp < 10){
-					constraints.add(new Constraint(game.getAdjacentVars(i,j), temp));
-				}
-				else{	
+				if (!game.isExplored(i,j)){
 					unassigned.add(new Variable(i,j,false));
 				}
 			}
 		}	
-
+		for (int i = 0; i < game.width(); i++){
+			for (int j = 0; j < game.height(); j++){
+				int temp = game.valOf(i,j);
+				if(temp < 10){
+					LinkedList<Variable> cons = new LinkedList<Variable>();
+					for (Variable v : unassigned){
+						for (Point p : game.getAdjacentPoints(i,j)){
+							if (p.x == v.x && p.y == v.y){
+								cons.add(v);
+							}
+						}
+					}
+					constraints.add(new Constraint(cons, temp, i, j));
+				}
+			}
+		}
 	}
-
-	private int index(int x, int y){
-		return x * game.width() + y;
-	}
-
 
 	//Printing methods------------//
 
-	private void printVarVals(){
+	private void printVarVals(boolean verbose){
 		for ( Variable var : assigned){
-			System.out.print( var.value + ", ");
+			if (!verbose){
+				System.out.print( var.value + ", ");
+			}
+			else{
+				System.out.println("(" + (var.x + 1) + ", " + (var.y + 1) + ") " + var.value);
+			}
 		}
 		System.out.println();
 	}

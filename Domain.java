@@ -16,7 +16,6 @@ class Domain{
 	public int remove(Integer val){
 		values.remove((Integer)val);
 		if(values.size() == 1){
-			System.out.println(values.get(0));
 			return values.get(0);
 		}
 		return -1;
