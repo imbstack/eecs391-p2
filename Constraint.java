@@ -1,7 +1,7 @@
 import java.util.Collection;
 import java.util.LinkedList;
 
-class Constraint{
+class Constraint implements Comparable{
 //Later make this take an interface called Solver for the local search too
 
 	LinkedList<Variable> vars;
@@ -19,40 +19,29 @@ class Constraint{
 		this.temp_y = ty;//TEMPORARY< REMOVE LATER
 	}
 
-	public boolean satisfied(Variable var, int value){
+	public boolean satisfied(){
 		//do this more efficiently later
-		boolean isHere = false;
-		for (Variable v : vars){
-			if (v.equals(var)) isHere = true;
-		}
-		if(!isHere)return true;
 		int sum = 0;
 		for (Variable v : vars){
 			//System.out.println(v.x + ", " + v.y + ", " + v.value);
-			if (!v.equals(var)){
-				sum += v.value;
-			}
-			else{
-				sum += value;
-			}
+			sum += v.value;
 		}
-		//System.out.println(sum + ", " + val);
-		//this.printSelf(var, value);
-		//boolean result = sum == val; //temporary, move to return statement
-		//System.out.println(result);
+		this.printSelf();
+		boolean result = sum == val; //temporary, move to return statement
+		System.out.println(result);
 		return sum == val;
 	}
 
-	private void printSelf(Variable var, int value){
+	private void printSelf(){
 		System.out.print("Constraint " + this.id + "("+temp_x+temp_y+")"+": ");//remove location stuff later!!!!
 		for (Variable v : vars){
-			if(!v.equals(var)){
-				System.out.print(v.value + " ");
-			}
-			else{
-				System.out.print(value + " ");
-			}
+			System.out.print(v.value + " ");
 		}
 		System.out.print(val + " ");
+	}
+
+	public int compareTo(Object o){
+		Constraint c = (Constraint)o;
+		return this.numConstraints - c.numConstraints;
 	}
 }
