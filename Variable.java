@@ -1,7 +1,7 @@
 class Variable implements Comparable{
 	public int x, y, value;
 
-	public Variable(int x, int y, boolean explored){
+	public Variable(int x, int y){
 		this.x = x;
 		this.y = y;
 		this.value = 0;
@@ -22,5 +22,11 @@ class Variable implements Comparable{
 
 	public boolean equals(Variable v){
 		return v.x == this.x && v.y == this.y;
+	}
+
+	public Variable clone(){
+		Variable v = new Variable(this.x, this.y);
+		v.set(this.value);
+		return v;
 	}
 }

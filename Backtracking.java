@@ -11,6 +11,7 @@ class Backtracking{
 	public LinkedList<Constraint> constraints;
 	private PriorityQueue<Variable> unassigned;
 	private Stack<Variable> assigned;
+	private LinkedList<Variable[]> assignment;
 	private static int[] domain = {1,0};
 	private Random generator;
 
@@ -19,13 +20,15 @@ class Backtracking{
 		constraints = new LinkedList<Constraint>();
 		unassigned = new PriorityQueue<Variable>();
 		assigned = new Stack<Variable>();
+		assignment = new LinkedList<Variable[]>();
 		generator = new Random();
+		
 	}
 
 	public void search(){
 		//interact with world in this one
 		updateState();
-		if (step(1)){
+		if (step()){
 			for ( Variable v : assigned ){
 				if ( v.value == 0){
 					System.out.println("Selection: "+ (v.x + 1) + ", " + (v.y + 1));
@@ -44,9 +47,18 @@ class Backtracking{
 	}
 
 
+
+	private boolean step(){
+
+	}
+
+/*
 	private boolean step(int level){
 		//System.out.println("----------------------------------" + level);
-		if (unassigned.isEmpty())return true;
+		if (unassigned.isEmpty()){
+			assignment.add(atoa());
+			return true;
+		}
 		Variable cvar = unassigned.poll();
 		//System.out.println(cvar.x + " " + cvar.y);
 		for (int i : domain){
@@ -66,7 +78,7 @@ class Backtracking{
 		}
 		return false;
 	}
-
+*/
 	private boolean isConsistent(Variable var, int value){
 		for (Constraint c : constraints){
 			if (!c.satisfied(var, value)){
@@ -76,14 +88,22 @@ class Backtracking{
 		return true;
 	}
 
+	private int[] atoa(){
+		Variable[] assign = new Variable[
+		for (Variable v : assigned){
+			 
+		}
+	}
+
 	private void updateState(){
+		assignment.clear();
 		unassigned.clear();
 		constraints.clear();
 		assigned.clear();
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
-				if (!game.isExplored(i,j)){
-					unassigned.add(new Variable(i,j,false));
+				if (!game.isExplored(i,j) && game.onBorder(i,j)){
+					unassigned.add(new Variable(i,j));
 				}
 			}
 		}	

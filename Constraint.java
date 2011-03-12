@@ -38,9 +38,9 @@ class Constraint{
 		}
 		//System.out.println(sum + ", " + val);
 		//this.printSelf(var, value);
-		//boolean result = sum <= val; //temporary, move to return statement
+		//boolean result = sum == val; //temporary, move to return statement
 		//System.out.println(result);
-		return sum <= val;
+		return sum == val;
 	}
 
 	private void printSelf(Variable var, int value){

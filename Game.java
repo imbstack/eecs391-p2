@@ -79,11 +79,20 @@ class Game{
 		for (int i = 0; i < width(); i++){
 			for (int j = 0; j < height(); j++){
 				if (!explored[i][j]){
-					vars.add(new Variable(i,j, false));
+					vars.add(new Variable(i,j));
 				}
 			}
 		}
 		return vars;
+	}
+
+	public boolean onBorder(int x, int y){
+		for (Point p : getAdjacentPoints(x,y)){
+			if (explored[p.x][p.y]){
+				return true;
+			}
+		}
+		return false;
 	}
 
 
