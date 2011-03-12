@@ -118,8 +118,8 @@ class Game{
 	}
 
 
-	public Game(int width, int height, int difficulty){
-		this(width, height, genRandPoints(width, height, difficulty),true);
+	public Game(int width, int height, int difficulty, boolean human){
+		this(width, height, genRandPoints(width, height, difficulty),human);
 	}
 
 	//other functions
