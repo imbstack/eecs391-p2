@@ -27,7 +27,7 @@ class Backtracking{
 	public void search(){
 		//interact with world in this one
 		updateState();
-		step();
+		step(unassigned);
 		int[][] count = new int[game.width()][game.height()];
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
@@ -51,10 +51,11 @@ class Backtracking{
 				}
 			}
 		}	
+		printVarVals(true);
 		int x = -1, y = -1;//saving value of least square
-		int min = constraints.size() + 1;//max possible value of square
+		int min = 10000000;
 		for (int i = 0; i < game.width(); i++){
-			for (int j = 0; j < game.width(); j++){
+			for (int j = 0; j < game.height(); j++){
 				if (count[i][j] != -1){
 					//later make this work for flagging too
 					if (count[i][j] < min){
@@ -67,12 +68,32 @@ class Backtracking{
 		}
 		System.out.println("Selection: "+ (x + 1) + ", " + (y + 1));
 		game.select(x,y,false);
-		printVarVals(true);
 	}
 
+	private boolean step(PriorityQueue<Variable> unas){
+		if (isCompletelyConsistent()){
+			assignment.add(atoa());
+			System.out.println("ADDED " + assignment.size());
+			return true;
+		}
+		if (unas.isEmpty()){
+			return false;
+		}
+		Variable cvar = unas.poll();
+		cvar.set(1);
+		if(isUnder()){
+			step(new PriorityQueue<Variable>(unas));
+		}
+		cvar.set(0);
+		if(isUnder()){
+			step(new PriorityQueue<Variable>(unas));
+		}
+		return true;
+	}
 
+		
 
-
+/*
 	//int count = 0;
 	private boolean step(){
 		System.out.println("STEP");
@@ -87,7 +108,6 @@ class Backtracking{
 		}
 		Variable cvar = unassigned.poll();
 		cvar.set(1);
-		
 		for (Constraint c : constraints){
 			//System.out.println("hbar");
 			if (c.satisfied()){
@@ -101,13 +121,31 @@ class Backtracking{
 			}
 		}
 		cvar.unset();
-		unassigned.add(cvar);
+		for (Constraint c : constraints){
+			//System.out.println("hbar");
+			if (c.satisfied()){
+				//System.out.println(count++);
+				boolean result = step();
+			}
+		}
+
+		//cvar.unset();
+		//unassigned.add(cvar);
 		return false;
 	}
-
+*/
 	private boolean isCompletelyConsistent(){
 		for (Constraint c : constraints){
-			if (!c.satisfied()){
+			if (!c.satisfied(true)){
+				return  false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isUnder(){
+		for (Constraint c : constraints){
+			if (!c.satisfied(false)){
 				return  false;
 			}
 		}

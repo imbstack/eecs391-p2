@@ -9,6 +9,7 @@ class Constraint implements Comparable{
 	private static int numConstraints = 0;
 	private int id;
 	private int temp_x, temp_y;//for debugging where this constraint is based
+	public boolean alreadySet;
 
 	public Constraint(Collection<Variable> vars, int val, int tx, int ty){
 		this.vars = (LinkedList<Variable>)vars;
@@ -17,19 +18,31 @@ class Constraint implements Comparable{
 		this.id = numConstraints;
 		this.temp_x = tx;
 		this.temp_y = ty;//TEMPORARY< REMOVE LATER
+		alreadySet = false;
 	}
 
-	public boolean satisfied(){
+	public boolean satisfied(boolean strict){
 		//do this more efficiently later
 		int sum = 0;
 		for (Variable v : vars){
 			//System.out.println(v.x + ", " + v.y + ", " + v.value);
 			sum += v.value;
 		}
-		this.printSelf();
-		boolean result = sum == val; //temporary, move to return statement
-		System.out.println(result);
+		//this.printSelf();
+		if (strict){
+		//boolean result = sum == val; //temporary, move to return statement
+		//System.out.println(result);
+		//if(result)alreadySet = true;
+		//if(!result)alreadySet = false;
 		return sum == val;
+		}
+		else{
+		//boolean result = sum <= val; //temporary, move to return statement
+		//System.out.println(result);
+		//if(result)alreadySet = true;
+		//if(!result)alreadySet = false;
+		return sum <= val;
+		}
 	}
 
 	private void printSelf(){
