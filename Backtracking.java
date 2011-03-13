@@ -52,8 +52,8 @@ class Backtracking{
 			}
 		}	
 		printVarVals(true);
-		int x = -1, y = -1;//saving value of least square
-		int min = 10000000;
+		int x = generator.nextInt(game.width()), y = generator.nextInt(game.height());//saving value of least square
+		int min = assignment.size() + 1;//max possible value
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
 				if (count[i][j] != -1){
@@ -62,6 +62,9 @@ class Backtracking{
 						min = count[i][j];
 						x = i;
 						y = j;
+					}
+					if (count[i][j] == assignment.size()){
+						game.select(x,y,true);
 					}
 				}
 			}
@@ -78,6 +81,11 @@ class Backtracking{
 		}
 		if (unas.isEmpty()){
 			return false;
+		}
+		for (Constraint c : constraints){
+			if (!c.satisfied(false)){
+				return false;
+			}
 		}
 		Variable cvar = unas.poll();
 		cvar.set(1);
