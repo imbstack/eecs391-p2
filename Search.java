@@ -5,7 +5,6 @@ import java.util.PriorityQueue;
 import java.util.Stack;
 import java.util.Random;
 
-
 class Search{
 
 	private Game game;
@@ -15,20 +14,27 @@ class Search{
 	private PriorityQueue<Variable> unassigned;
 	private static int[] domain = {1,0};
 	private Random generator;
+	private boolean searchtype;
 
-	public Search(Game game){
+	public Search(Game game, boolean backtrackp){
 		this.game = game;
 		constraints = new LinkedList<Constraint>();
 		variables = new ArrayList<Variable>();
 		assignment = new LinkedList<Variable[]>();
 		unassigned = new PriorityQueue<Variable>();
 		generator = new Random();
+		this.searchtype = backtrackp;
 	}
 
 	public void search(){
 		//interact with world in this one
 		updateState();
-		step(unassigned);
+		if (searchtype){
+			backtrack(unassigned);
+		}
+		else{
+			local();
+		}
 		int[][] count = new int[game.width()][game.height()];
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
@@ -76,4 +82,127 @@ class Search{
 		game.select(x,y,false);
 	}
 
+	private boolean backtrack(PriorityQueue<Variable> unas){
+		if (isCompletelyConsistent()){
+			assignment.add(atoa());
+			//System.out.println("ADDED " + assignment.size());
+			return true;
+		}
+		if (unas.isEmpty()){
+			return false;
+		}
+		Variable cvar = unas.poll();
+		cvar.set(1);
+		if(isUnder()){
+			backtrack(new PriorityQueue<Variable>(unas));
+		}
+		if(!game.isFlagged(cvar.x,cvar.y)){
+			cvar.set(0);
+			backtrack(new PriorityQueue<Variable>(unas));
+		}
+		return true;
+	}
+
+	private boolean local(){
+		return false;
+	}
+
+	private boolean isCompletelyConsistent(){
+		for (Constraint c : constraints){
+			if (!c.satisfied(true)){
+				return  false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isUnder(){
+		for (Constraint c : constraints){
+			if (!c.satisfied(false)){
+				return  false;
+			}
+		}
+		return true;
+	}
+
+	private Variable[] atoa(){
+		Variable[] assign = new Variable[variables.size()];
+		for (int i = 0; i < assign.length; i++){
+			assign[i] = variables.get(i).clone();
+		}
+		return assign;
+	}
+
+	private void updateState(){
+		assignment.clear();
+		variables.clear();
+		constraints.clear();
+		unassigned.clear();
+		for (int i = 0; i < game.width(); i++){
+			for (int j = 0; j < game.height(); j++){
+				if (!game.isExplored(i,j) && game.onBorder(i,j)){
+					Variable v = new Variable(i,j);
+					variables.add(v);
+					if ( game.isFlagged(i,j)){
+						v.set(1);
+					}
+				}
+			}
+		}	
+		for (int i = 0; i < game.width(); i++){
+			for (int j = 0; j < game.height(); j++){
+				int temp = game.valOf(i,j);
+				if(temp < 10 && temp > 0){
+					LinkedList<Variable> cons = new LinkedList<Variable>();
+					for (Variable v : variables){
+						for (Point p : game.getAdjacentPoints(i,j)){
+							if (p.x == v.x && p.y == v.y){
+								cons.add(v);
+							}
+						}
+					}
+					constraints.add(new Constraint(cons, temp, i, j));
+				}
+			}
+		}
+		unassigned = new PriorityQueue<Variable>(variables);
+	}
+
+	//Printing methods------------//
+
+	private void printVarVals(boolean verbose){
+		//System.out.println("Size: " + assignment.size());
+		for ( Variable[] arr : assignment){
+			for ( Variable var : arr){
+				if (!verbose){
+					System.out.print( var.value + ", ");
+				}
+				else{
+					System.out.println("(" + (var.x + 1) + ", " + (var.y + 1) + ") " + var.value);
+				}
+			}
+			System.out.println();
+		}
+	}
+
+	private void prettyPrint(){
+		Variable[][] backToBoard = new Variable[game.width()][game.height()];
+		for (Variable v : variables){
+			backToBoard[v.x][v.y] = v;
+		}
+		int tid = 1;
+		for (int j = 0; j < game.height(); j++){
+			for (int i = 0; i < game.width(); i++){
+				if (backToBoard[i][j] != null){
+					Variable v = backToBoard[i][j];
+					System.out.print("V" + tid++ + "(" + (v.y + 1) + "," + (v.x + 1) + ") ");
+					for (Variable[] arr : assignment){
+						System.out.print("{" + arr[variables.indexOf(v)].value  + "}");
+					}
+					System.out.println();
+				}
+			}
+		}
+	}
 }
+

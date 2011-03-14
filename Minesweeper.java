@@ -1,17 +1,21 @@
+import java.util.Scanner;
+
 class Minesweeper{
 	public static void main(String[] args){
-		//Clean up the interface and check input if time exists for it
-		if (args.length > 0){
-			if (args[3].equals("true")){
-				Game play = new Game(Integer.parseInt(args[1]), Integer.parseInt(args[0]), Integer.parseInt(args[2]), true);
-			}
-			else{
-				Game play = new Game(Integer.parseInt(args[1]), Integer.parseInt(args[0]), Integer.parseInt(args[2]), false);
-			}
+		Scanner input = new Scanner(System.in);
+		System.out.println("In the following prompts enter the number following the choice you want and hit enter to select that option");
+		System.out.println("Select game for player (1) or computer solver (2):");
+		if (input.nextLine().equals("1")){
+			Game play = new Game(true);
 		}
 		else{
-			Game play = new Game();
+			System.out.println("Select backtracking search (1) or local search (2):");
+			if(input.nextLine().equals("1")){
+				Game play = new Game(false, true);
+			}
+			else{
+				Game play = new Game(false, false);
+			}
 		}
-	}
-
+	}	
 }

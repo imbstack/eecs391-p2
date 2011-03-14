@@ -120,7 +120,7 @@ class Game{
 
 	//constructors
 
-	private Game(int width, int height, Point[] mines, boolean human){
+	private Game(int width, int height, Point[] mines, boolean human, boolean backtrackp){
 		gridDims = new Dimension(width, height);
 		grid = new short[gridDims.width][gridDims.height];
 		explored = new boolean[gridDims.width][gridDims.height];
@@ -140,18 +140,22 @@ class Game{
 			playGameVsHuman();
 		}
 		else{
-			playGame();
+			playGame(backtrackp);
 		}
 	}
 
 
-	public Game(){
-		this(5,5, dboard, false);
+	public Game(boolean human){
+		this(5,5, dboard, human, true);
+	}
+
+	public Game(boolean human, boolean backtrackp){
+		this(5,5, dboard, false, backtrackp);
 	}
 
 
-	public Game(int width, int height, int difficulty, boolean human){
-		this(width, height, genRandPoints(width, height, difficulty),human);
+	public Game(int width, int height, int difficulty, boolean human, boolean backtrackp){
+		this(width, height, genRandPoints(width, height, difficulty),human,backtrackp);
 	}
 
 	//other functions
@@ -203,12 +207,12 @@ class Game{
 
 	}
 
-	private void playGame(){
-		Backtracking back = new Backtracking(this);
+	private void playGame(boolean backtrackp){
+		Search search = new Search(this, backtrackp);
 		int play = 1;
 		while( !gameOver() ) {
 			System.out.println("MOVE: " + play++);
-			back.search();
+			search.search();
 			printState();
 		}
 		if (hasWon){
