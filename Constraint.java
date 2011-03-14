@@ -1,7 +1,7 @@
 import java.util.Collection;
 import java.util.LinkedList;
 
-class Constraint implements Comparable{
+class Constraint{
 //Later make this take an interface called Solver for the local search too
 
 	LinkedList<Variable> vars;
@@ -51,10 +51,5 @@ class Constraint implements Comparable{
 			System.out.print(v.value + " ");
 		}
 		System.out.print(val + " ");
-	}
-
-	public int compareTo(Object o){
-		Constraint c = (Constraint)o;
-		return this.numConstraints - c.numConstraints;
 	}
 }

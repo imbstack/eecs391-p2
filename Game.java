@@ -15,6 +15,7 @@ class Game{
 	private Scanner input = new Scanner(System.in);
 	private static Point[] dboard = {new Point(2,1), new Point(1,3), new Point(3,3)};
 	private static boolean hasWon = true;
+	private int mineCount, flagCount;
 
 
 	//getters and setters
@@ -40,9 +41,17 @@ class Game{
 		return explored[x][y];
 	}
 	public boolean select(int x, int y, boolean flag){
+		if (explored[x][y]){
+			System.out.println("Already selected, try again!");
+			return false;
+		}
 		if (flag){
-			flagged[x][y] = true;
-			return true;
+			if (flagCount++ < mineCount){
+				flagged[x][y] = true;
+				return true;
+			}
+			System.out.println("Too many flags used!");
+			return false;
 		}
 		else{
 			explored[x][y] = true;
@@ -56,6 +65,18 @@ class Game{
 			return true;
 		}
 	}
+
+	public boolean removeFlag(int x, int y){
+		if (flagged[x][y]){
+			flagged[x][y] = false;
+			return true;
+		}
+		else{
+			System.out.println("No flag there");
+			return false;
+		}
+	}
+
 	public LinkedList<Point> getAdjacentPoints(int x, int y){
 		LinkedList<Point> adjacents = new LinkedList<Point>();
 		int cx,cy;
@@ -104,6 +125,8 @@ class Game{
 		grid = new short[gridDims.width][gridDims.height];
 		explored = new boolean[gridDims.width][gridDims.height];
 		flagged = new boolean[gridDims.width][gridDims.height];
+		this.mineCount = mines.length;
+		this.flagCount = 0;
 		for(Point mine : mines){
 			grid[mine.x][mine.y] = 9;
 		}
@@ -144,7 +167,13 @@ class Game{
 		Point[] ret = new Point[(int)(width * height * frac)];
 		Random generator = new Random();
 		for (int i = 0; i < ret.length; i++){
-			ret[i] = new Point(generator.nextInt(height), generator.nextInt(width));
+			int tx = generator.nextInt(width);
+			int ty = generator.nextInt(height);
+			if (tx == 0 && ty == 0){
+				tx +=1;
+				ty +=1;
+			}
+				ret[i] = new Point(tx,ty);
 		}
 		return ret;
 
@@ -153,6 +182,7 @@ class Game{
 	private void playGameVsHuman(){
 		String welcome = "Ready to play?\nEach selection is made with a triple\nof the form y x [flag], where "+
 		       		 "each of\nthe coordinates is indexed from 1 and the\nflag is represented by an optional f\n"+
+				 "to remove a flag pass in an r in the f position\n"+
 				 "To quit early, pass in the string \"quit\"\nwithout the quotes.\n";
 		System.out.println(welcome);	
 		boolean t;
@@ -191,7 +221,6 @@ class Game{
 		System.exit(0);
 	}
 
-
 	private boolean humanPlay(){
 		System.out.println("Select next spot:");
 		String in = input.nextLine();
@@ -207,6 +236,9 @@ class Game{
 			if (x > gridDims.width || y > gridDims.height || x < 0 || y < 0){
 				System.err.println("Invalid coordinates, try again!");
 				return false;
+			}
+			if (selection.length == 3 && selection[2].charAt(0) == 'r'){
+				return removeFlag(x,y);
 			}
 			return select(x, y, flagging);
 		}
@@ -261,8 +293,8 @@ class Game{
 
 	public void printFullGrid(){
 		System.out.println("-Values====================");
-		for(int i = 0; i < gridDims.width; i++){
-			for(int j = 0; j < gridDims.height; j++){
+		for(int i = 0; i < gridDims.height; i++){
+			for(int j = 0; j < gridDims.width; j++){
 				System.out.print(grid[j][i] + " ");
 			}
 			System.out.println();
@@ -272,8 +304,8 @@ class Game{
 
 	public void showMines(){
 		System.out.println("-Mines=====================");
-		for(int i = 0; i < gridDims.width; i++){
-			for(int j = 0; j < gridDims.height; j++){
+		for(int i = 0; i < gridDims.height; i++){
+			for(int j = 0; j < gridDims.width; j++){
 				if(grid[j][i] == 9){
 					System.out.print("✸ ");
 				}
@@ -288,8 +320,8 @@ class Game{
 
 	public void printState(){
 		System.out.println("-Move======================");
-		for(int i = 0; i < gridDims.width; i++){
-			for(int j = 0; j < gridDims.height; j++){
+		for(int i = 0; i < gridDims.height; i++){
+			for(int j = 0; j < gridDims.width; j++){
 				if(explored[j][i]){
 					if(grid[j][i] == 9){
 						System.out.print("✸ ");

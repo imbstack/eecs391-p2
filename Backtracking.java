@@ -8,7 +8,7 @@ import java.util.Random;
 class Backtracking{
 
 	private Game game;
-	public PriorityQueue<Constraint> constraints;
+	public LinkedList<Constraint> constraints;
 	private ArrayList<Variable> variables;
 	private LinkedList<Variable[]> assignment;
 	private PriorityQueue<Variable> unassigned;
@@ -17,7 +17,7 @@ class Backtracking{
 
 	public Backtracking(Game game){
 		this.game = game;
-		constraints = new PriorityQueue<Constraint>();
+		constraints = new LinkedList<Constraint>();
 		variables = new ArrayList<Variable>();
 		assignment = new LinkedList<Variable[]>();
 		unassigned = new PriorityQueue<Variable>();
@@ -51,7 +51,8 @@ class Backtracking{
 				}
 			}
 		}	
-		printVarVals(true);
+		//printVarVals(true);
+		prettyPrint();
 		int x = generator.nextInt(game.width()), y = generator.nextInt(game.height());//saving value of least square
 		int min = assignment.size() + 1;//max possible value
 		for (int i = 0; i < game.width(); i++){
@@ -63,85 +64,38 @@ class Backtracking{
 						x = i;
 						y = j;
 					}
-					if (count[i][j] == assignment.size()){
-						game.select(x,y,true);
+					if (count[i][j] == assignment.size() && !game.isFlagged(i,j)){
+						System.out.println("Flagged: (" + (y + 1) + "," + (x + 1) + ")");
+						game.select(i,j,true);
 					}
 				}
 			}
 		}
-		System.out.println("Selection: "+ (x + 1) + ", " + (y + 1));
+		System.out.println("Selection: ("+ (y + 1) + "," + (x + 1) + ")");
 		game.select(x,y,false);
 	}
 
 	private boolean step(PriorityQueue<Variable> unas){
 		if (isCompletelyConsistent()){
 			assignment.add(atoa());
-			System.out.println("ADDED " + assignment.size());
+			//System.out.println("ADDED " + assignment.size());
 			return true;
 		}
 		if (unas.isEmpty()){
 			return false;
-		}
-		for (Constraint c : constraints){
-			if (!c.satisfied(false)){
-				return false;
-			}
 		}
 		Variable cvar = unas.poll();
 		cvar.set(1);
 		if(isUnder()){
 			step(new PriorityQueue<Variable>(unas));
 		}
-		cvar.set(0);
-		if(isUnder()){
+		if(!game.isFlagged(cvar.x,cvar.y)){
+			cvar.set(0);
 			step(new PriorityQueue<Variable>(unas));
 		}
 		return true;
 	}
 
-		
-
-/*
-	//int count = 0;
-	private boolean step(){
-		System.out.println("STEP");
-		
-		if (isCompletelyConsistent()){
-			assignment.add(atoa());
-			System.out.println("ADDED " + assignment.size());
-			return true;
-		}
-		if (unassigned.isEmpty()){
-			return false;
-		}
-		Variable cvar = unassigned.poll();
-		cvar.set(1);
-		for (Constraint c : constraints){
-			//System.out.println("hbar");
-			if (c.satisfied()){
-				//System.out.println(count++);
-				boolean result = step();
-				if (!result){
-					//System.out.println("UNSET");
-					cvar.unset();
-					unassigned.add(cvar);
-				}
-			}
-		}
-		cvar.unset();
-		for (Constraint c : constraints){
-			//System.out.println("hbar");
-			if (c.satisfied()){
-				//System.out.println(count++);
-				boolean result = step();
-			}
-		}
-
-		//cvar.unset();
-		//unassigned.add(cvar);
-		return false;
-	}
-*/
 	private boolean isCompletelyConsistent(){
 		for (Constraint c : constraints){
 			if (!c.satisfied(true)){
@@ -160,6 +114,13 @@ class Backtracking{
 		return true;
 	}
 
+	private void inferences(){
+		//simple case of inference
+		for (Constraint c : constraints){
+			if (c.
+		}
+	}
+
 	private Variable[] atoa(){
 		Variable[] assign = new Variable[variables.size()];
 		for (int i = 0; i < assign.length; i++){
@@ -176,7 +137,11 @@ class Backtracking{
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
 				if (!game.isExplored(i,j) && game.onBorder(i,j)){
-					variables.add(new Variable(i,j));
+					Variable v = new Variable(i,j);
+					variables.add(v);
+					if ( game.isFlagged(i,j)){
+						v.set(1);
+					}
 				}
 			}
 		}	
@@ -202,7 +167,7 @@ class Backtracking{
 	//Printing methods------------//
 
 	private void printVarVals(boolean verbose){
-		System.out.println("Size: " + assignment.size());
+		//System.out.println("Size: " + assignment.size());
 		for ( Variable[] arr : assignment){
 			for ( Variable var : arr){
 				if (!verbose){
@@ -213,6 +178,26 @@ class Backtracking{
 				}
 			}
 			System.out.println();
+		}
+	}
+
+	private void prettyPrint(){
+		Variable[][] backToBoard = new Variable[game.width()][game.height()];
+		for (Variable v : variables){
+			backToBoard[v.x][v.y] = v;
+		}
+		int tid = 1;
+		for (int j = 0; j < game.height(); j++){
+			for (int i = 0; i < game.width(); i++){
+				if (backToBoard[i][j] != null){
+					Variable v = backToBoard[i][j];
+					System.out.print("V" + tid++ + "(" + (v.y + 1) + "," + (v.x + 1) + ") ");
+					for (Variable[] arr : assignment){
+						System.out.print("{" + arr[variables.indexOf(v)].value  + "}");
+					}
+					System.out.println();
+				}
+			}
 		}
 	}
 }

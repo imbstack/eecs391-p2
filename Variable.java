@@ -17,6 +17,7 @@ class Variable implements Comparable{
 	}
 
 
+	//This is using the most constrained heuristic
 	public int compareTo(Object o){
 		Variable v = (Variable)o;
 		return v.constrained - this.constrained;
