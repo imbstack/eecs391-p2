@@ -33,31 +33,28 @@ C = \{ (V_1, V_2) &= V_1 + V_2 = 1,\\
 \item In the tree, if any nodes did not branch for their children, I collapsed them into one to save space.\\ %CHECK THIS AND POSSIBLY IMPROVE THIS LATER
 \begin{center}
 \begin{tikzpicture}
-\tikzset{level distance=72pt}
+\tikzset{level distance=48pt}
 \tikzstyle{every node}=[rectangle,draw]
-\Tree [.Unasigned [.{$V_1 = 0$} [.\shortstack{$V_1 = 0$\\ $V_2 = 1$} 
-[.\shortstack{$V_1 = 0$\\ $V_2 = 1$\\ $V_3 = 1$\\ $V_4 = 0$\\ $V_5 = 0$} ]  
-[.\shortstack{$V_1 = 0$\\ $V_2 = 1$\\ $V_3 = 0$\\ $V_4 = 1$\\ $V_5 = 0$} ] 
-[.\shortstack{$V_1 = 0$\\ $V_2 = 1$\\ $V_3 = 0$\\ $V_4 = 0$\\ $V_5 = 1$} ] 
-] ] [.{$V_1 = 1$} [.\shortstack{$V_1 = 1$\\ $V_2 = 0$} 
-[.\shortstack{$V_1 = 1$\\ $V_2 = 0$\\ $V_3 = 1$\\ $V_4 = 0$\\ $V_5 = 0$} ]  
-[.\shortstack{$V_1 = 1$\\ $V_2 = 0$\\ $V_3 = 0$\\ $V_4 = 1$\\ $V_5 = 0$} ] 
-[.\shortstack{$V_1 = 1$\\ $V_2 = 0$\\ $V_3 = 0$\\ $V_4 = 0$\\ $V_5 = 1$} ] 
-] ] ]  
+\Tree [.Unasigned [.{$V_1 = 0$}
+[.\shortstack{$V_1 = 0$ $V_2 = 1$\\ $V_3 = 1$ $V_4 = 0$\\ $V_5 = 0$} ]  
+[.\shortstack{$V_1 = 0$ $V_2 = 1$\\ $V_3 = 0$ $V_4 = 1$\\ $V_5 = 0$} ] 
+] [.{$V_1 = 1$} 
+[.\shortstack{$V_1 = 1$ $V_2 = 0$\\ $V_3 = 1$ $V_4 = 0$\\ $V_5 = 0$} ]  
+[.\shortstack{$V_1 = 1$ $V_2 = 0$\\ $V_3 = 0$ $V_4 = 1$\\ $V_5 = 0$} ] 
+] ]   
 \end{tikzpicture}
 \end{center}
-The next move is the same no matter which path is chosen. %THIS NEEDS TO BE EXPANDED
-\item All six possibilities are enumerated below\\
+It does provide an optimal next choice.
+\item All four possibilities are enumerated below\\
 \begin{tabular}{ccccc}
 $V_1$&$V_2$&$V_3$&$V_4$&$V_5$\\\hline
 0&1&1&0&0\\
 0&1&0&1&0\\
-0&1&0&0&1\\
 1&0&1&0&0\\
-1&0&0&1&0\\
-1&0&0&0&1
+1&0&0&1&0
 \end{tabular}
-\item a 
+\item $V_5$ cannot possibly reveal a mine because in no possible configuration does it contain one.
+\item DOOOOOOOO THHHHHHHHHHHHHHIIIIIIIIIIIIS LATEDR
 \end{enumerate}
 \section*{Observations on Solutions}
 \begin{enumerate}

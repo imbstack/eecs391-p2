@@ -114,13 +114,6 @@ class Backtracking{
 		return true;
 	}
 
-	private void inferences(){
-		//simple case of inference
-		for (Constraint c : constraints){
-			if (c.
-		}
-	}
-
 	private Variable[] atoa(){
 		Variable[] assign = new Variable[variables.size()];
 		for (int i = 0; i < assign.length; i++){
