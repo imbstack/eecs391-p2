@@ -8,7 +8,7 @@ class Constraint{
 	int val;//What the variables must sum up to
 	private static int numConstraints = 0;
 	private int id;
-	private int temp_x, temp_y;//for debugging where this constraint is based
+	public int x, y;
 	public boolean alreadySet;
 
 	public Constraint(Collection<Variable> vars, int val, int tx, int ty){
@@ -16,8 +16,8 @@ class Constraint{
 		this.val = val;
 		numConstraints++;
 		this.id = numConstraints;
-		this.temp_x = tx;
-		this.temp_y = ty;//TEMPORARY< REMOVE LATER
+		this.x = tx;
+		this.y = ty;
 		alreadySet = false;
 	}
 
@@ -46,7 +46,7 @@ class Constraint{
 	}
 
 	private void printSelf(){
-		System.out.print("Constraint " + this.id + "("+temp_x+temp_y+")"+": ");//remove location stuff later!!!!
+		System.out.print("Constraint " + this.id + "("+x+y+")"+": ");//remove location stuff later!!!!
 		for (Variable v : vars){
 			System.out.print(v.value + " ");
 		}

@@ -2,17 +2,15 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.awt.Point;
 import java.util.PriorityQueue;
-import java.util.Stack;
 import java.util.Random;
 
 class Search{
 
 	private Game game;
-	public LinkedList<Constraint> constraints;
+	private LinkedList<Constraint> constraints;
 	private ArrayList<Variable> variables;
 	private LinkedList<Variable[]> assignment;
 	private PriorityQueue<Variable> unassigned;
-	private static int[] domain = {1,0};
 	private Random generator;
 	private boolean searchtype;
 
