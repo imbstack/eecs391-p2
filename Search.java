@@ -30,7 +30,7 @@ class Search{
 		//interact with world in this one
 		updateState();
 		if (searchtype){
-			backtrack(unassigned);
+			backtrack();
 		}
 		else{
 			local();
@@ -60,8 +60,8 @@ class Search{
 		}	
 		//printVarVals(true);
 		prettyPrint();
-		int x = generator.nextInt(game.width()), y = generator.nextInt(game.height());//saving value of least square
-		int min = assignment.size() + 1;//max possible value
+		int x = generator.nextInt(game.width()), y = generator.nextInt(game.height());
+		int min = assignment.size();//max possible value
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
 				if (count[i][j] != -1){
@@ -82,24 +82,26 @@ class Search{
 		game.select(x,y,false);
 	}
 
-	private boolean backtrack(PriorityQueue<Variable> unas){
+	private boolean backtrack(){
 		if (isCompletelyConsistent()){
 			assignment.add(atoa());
 			//System.out.println("ADDED " + assignment.size());
 			return true;
 		}
-		if (unas.isEmpty()){
+		if (unassigned.isEmpty()){
 			return false;
 		}
-		Variable cvar = unas.poll();
+		Variable cvar = unassigned.poll();
 		cvar.set(1);
 		if(isUnder()){
-			backtrack(new PriorityQueue<Variable>(unas));
+			backtrack();
 		}
 		if(!game.isFlagged(cvar.x,cvar.y)){
 			cvar.set(0);
-			backtrack(new PriorityQueue<Variable>(unas));
+			backtrack();
 		}
+		cvar.unset();
+		unassigned.add(cvar);
 		return true;
 	}
 
