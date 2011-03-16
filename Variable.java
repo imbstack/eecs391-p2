@@ -16,6 +16,9 @@ class Variable implements Comparable{
 		this.value = 0;
 	}
 
+	public void flip(){
+		this.value = Math.abs(value - 1);
+	}
 
 	//This is using the most constrained heuristic
 	public int compareTo(Object o){

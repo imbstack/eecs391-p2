@@ -31,7 +31,9 @@ class Search{
 			backtrack();
 		}
 		else{
-			local();
+			for (int i = 0; i < game.height() * 2; i++){
+				local(0);
+			}
 		}
 		int[][] count = new int[game.width()][game.height()];
 		for (int i = 0; i < game.width(); i++){
@@ -58,7 +60,9 @@ class Search{
 		}	
 		//printVarVals(true);
 		prettyPrint();
-		int x = generator.nextInt(game.width()), y = generator.nextInt(game.height());
+		LinkedList<Variable> valSels = game.getUnexploredVars();
+		int sel = generator.nextInt(valSels.size());
+		int x = valSels.get(sel).x, y = valSels.get(sel).y;
 		int min = assignment.size();//max possible value
 		for (int i = 0; i < game.width(); i++){
 			for (int j = 0; j < game.height(); j++){
@@ -69,7 +73,7 @@ class Search{
 						x = i;
 						y = j;
 					}
-					if (count[i][j] == assignment.size() && !game.isFlagged(i,j)){
+					if (count[i][j] == assignment.size() && !game.isFlagged(i,j) && searchtype){
 						System.out.println("Flagged: (" + (y + 1) + "," + (x + 1) + ")");
 						game.select(i,j,true);
 					}
@@ -103,8 +107,49 @@ class Search{
 		return true;
 	}
 
-	private boolean local(){
+	/**
+	 * Random restart local search
+	 */
+	private void local(int steps){
+		for (Variable v : variables){
+			v.set(generator.nextInt(2));
+		}
+		while (steps++ < 10000 ){
+			if (isCompletelyConsistent() && ! alreadyFound()){
+				assignment.add(atoa());
+				for (Variable v : variables){
+					v.set(generator.nextInt(2));
+				}
+			}
+			else{
+				Variable var = variables.get(0);
+				float min = Float.POSITIVE_INFINITY;
+				for (Variable v : variables){
+					v.flip();
+					if (cdiff() < min){
+						min = cdiff();
+						var = v;
+					}
+					v.flip();
+				}
+				var.flip();
+			}
+		}
+	}
+
+	private boolean alreadyFound(){
+		Variable[] test = atoa();
+		for (Variable[] v : assignment){
+			if (sameArray(v,test))return true;	
+		}
 		return false;
+	}
+
+	private boolean sameArray(Variable[] arr1, Variable[] arr2){
+		for (int i = 0; i < arr2.length; i++){
+			if (arr1[i].value != arr2[i].value)return false;
+		}
+		return true;
 	}
 
 	private boolean isCompletelyConsistent(){
@@ -123,6 +168,14 @@ class Search{
 			}
 		}
 		return true;
+	}
+
+	private int cdiff(){
+		int total = 0;
+		for (Constraint c : constraints){
+			total += c.diff();
+		}
+		return total;
 	}
 
 	private Variable[] atoa(){

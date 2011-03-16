@@ -45,6 +45,14 @@ class Constraint{
 		}
 	}
 
+	public int diff(){
+		int sum = 0;
+		for (Variable v : vars){
+			sum += v.value;
+		}
+		return Math.abs(val - sum);
+	}
+
 	private void printSelf(){
 		System.out.print("Constraint " + this.id + "("+x+y+")"+": ");//remove location stuff later!!!!
 		for (Variable v : vars){
