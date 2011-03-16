@@ -1,8 +1,8 @@
 Minesweeper Game
 
-Description Here
+Agents that solve minesweeper games using backtracking and local search.
 
 Build:
----more---
+javac ./*.java
 Run:
----more---
+java Minesweeper
